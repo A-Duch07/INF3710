@@ -22,18 +22,8 @@
     text-align: center;
 }
 
-.hotel1 {
+.veto1 {
     color: var(--theme-purple);
-    font-family: 'Varela Round', sans-serif;
-}
-
-.hotel2 {
-    color: var(--theme-blue);
-    font-family: 'Varela Round', sans-serif;
-}
-
-.hotel3 {
-    color: var(--theme-lightblue);
     font-family: 'Varela Round', sans-serif;
 }
 

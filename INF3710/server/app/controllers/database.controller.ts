@@ -90,9 +90,9 @@ export class DatabaseController {
         const hotelNb: string = req.params.hotelNb;
         this.databaseService
           .deleteHotel(hotelNb)
-          .then((result: pg.QueryResult) => {
-            res.json(result.rowCount);
-          })
+          // .then((result: pg.QueryResult) => {
+          //   res.json(result.rowCount);
+          // })
           .catch((e: Error) => {
             console.error(e.stack);
           });

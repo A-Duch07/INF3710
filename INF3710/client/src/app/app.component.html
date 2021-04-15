@@ -1,20 +1,19 @@
 <nav class="navbar navbar-dark bg-dark">
-  <a class="navbar-brand title" href="/">INF3710 - TP5</a>
+  <a class="navbar-brand title" href="/">INF3710 - TP3</a>
   <div class="navbar-expand mr-auto">
     <div class="navbar-nav">
-      <a class="nav-item nav-link active" routerLink="/hotels">Hotels</a>
-      <a class="nav-item nav-link active" routerLink="/rooms">Rooms</a>
-      <a class="nav-item nav-link active" routerLink="/guests">Guests</a>
+      <a class="nav-item nav-link active" routerLink="/animal">Animal</a>
+      <a class="nav-item nav-link active" routerLink="/traitement">Traitement</a>
+      <a class="nav-item nav-link active" routerLink="/facture">Facture</a>
     </div>
   </div>
 </nav>
 
 <div class="home" *ngIf="route == ''">
   <p>
-    Welcome<br />to<br /><span class="hotel1">hotels</span
-    ><span class="hotel2">hotels</span><span class="hotel3">hotels</span>
+    Bienvenue<br />à<br /><span class="veto1">VetoSansFrontieres </span>
   </p>
-  <button type="button" class="btn" routerLink="/hotels">CHECK OUR HOTELS &#10140;</button>
+  <button type="button" class="btn" routerLink="/animal">Rechercher pour votre animal &#10140;</button>
 </div>
 
 <router-outlet></router-outlet>
