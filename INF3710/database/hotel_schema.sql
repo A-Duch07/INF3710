@@ -1,49 +1,97 @@
-SET search_path = hotelDB;
+ROLLBACK;
+BEGIN;
+SET search_path = TP3;
+DROP SCHEMA IF EXISTS TP3 CASCADE;
+CREATE SCHEMA TP3;
+SET datestyle TO European;
 
-DROP SCHEMA IF EXISTS HOTELDB CASCADE;
-CREATE SCHEMA HOTELDB;
-
-CREATE TABLE IF NOT EXISTS HOTELDB.Hotel (
-    hotelNb     VARCHAR(10)     NOT NULL,
-    name        VARCHAR(20)     NOT NULL,
-    city        VARCHAR(50)     NOT NULL,
-    PRIMARY KEY (hotelNb)
+CREATE TABLE TP3.Clinique (
+    NoClinique VARCHAR NOT NULL,
+    AdrRue VARCHAR NOT NULL,
+    AdrVille VARCHAR NOT NULL,
+    AdrProvince VARCHAR NOT NULL,
+    AdrCodePostal VARCHAR NOT NULL,
+    NumTel BIGINT NOT NULL,
+    NumFax BIGINT NOT NULL,
+    NoGestionnaire BIGINT NOT NULL,
+    PRIMARY KEY (NoClinique)
 );
-
-CREATE TABLE IF NOT EXISTS HOTELDB.Room(
-    roomNb  VARCHAR(10)     NOT NULL,
-    hotelNb VARCHAR(10)     NOT NULL,
-    type    VARCHAR(10)     NOT NULL,
-    price   NUMERIC(6,3)    NOT NULL,
-    PRIMARY KEY (roomNb, hotelNb),
-    FOREIGN KEY(hotelNb) REFERENCES HOTELDB.Hotel(hotelNb) ON DELETE RESTRICT ON UPDATE CASCADE
+CREATE DOMAIN TP3.sexType AS CHAR CHECK (VALUE IN ('M', 'F'));
+CREATE TABLE TP3.Personnel(
+    NID INT NOT NULL,
+    Nom VARCHAR NOT NULL,
+    Prenom VARCHAR NOT NULL,
+    AdrVille VARCHAR NOT NULL,
+    AdrProvince VARCHAR NOT NULL,
+    AdrCodePostal VARCHAR NOT NULL,
+    NumTel VARCHAR NOT NULL,
+    DateNaissance DATE NOT NULL,
+    Sexe sexType DEFAULT 'M' NOT NULL,
+    NAS VARCHAR UNIQUE NOT NULL,
+    Fonction VARCHAR NOT NULL,
+    Salaire VARCHAR NOT NULL,
+    NoClinique VARCHAR NOT NULL,
+    PRIMARY KEY (NID)
 );
-
-CREATE DOMAIN HOTELDB.genderType AS CHAR
-    CHECK (VALUE IN ('M', 'F', 'O'));
-
-CREATE TABLE IF NOT EXISTS HOTELDB.Guest(
-    guestNb VARCHAR(10) NOT NULL,
-    nas     VARCHAR(10) UNIQUE NOT NULL,
-    name    VARCHAR(20) NOT NULL,
-    gender  genderType  DEFAULT 'M',
-    city    VARCHAR(50) NOT NULL,
-    PRIMARY KEY (guestNb)
+ALTER TABLE TP3.Clinique
+ADD CONSTRAINT table1_fk FOREIGN KEY (NoGestionnaire) REFERENCES Personnel(NID);
+ALTER TABLE TP3.Personnel
+ADD CONSTRAINT table2_fk FOREIGN KEY (NoClinique) REFERENCES Clinique(NoClinique);
+SET CONSTRAINTS ALL DEFERRED;
+CREATE TABLE TP3.ProprietaireAnimal (
+    NoProprietaire INT NOT NULL,
+    NoClinique VARCHAR NOT NULL,
+    Nom VARCHAR NOT NULL,
+    Prénom VARCHAR NOT NULL,
+    AdrVille VARCHAR NOT NULL,
+    AdrProvince VARCHAR NOT NULL,
+    AdrCodePostal VARCHAR NOT NULL,
+    NumTel BIGINT NOT NULL,
+    UNIQUE (NoProprietaire, NoClinique),
+    FOREIGN KEY (NoClinique) REFERENCES Clinique(NoClinique),
+    PRIMARY KEY (NoProprietaire, NoClinique)
 );
-
-CREATE TABLE IF NOT EXISTS HOTELDB.Booking(
-    hotelNb     VARCHAR(10)     NOT NULL,
-    roomNb      VARCHAR(10)     NOT NULL,
-    guestNb     VARCHAR(10)     NOT NULL,
-    dateFrom    DATE            NOT NULL,
-    dateTo      DATE            NULL,
-    PRIMARY KEY (hotelNb, guestNb, roomNb, dateFrom),
-    FOREIGN KEY (guestNb) REFERENCES HOTELDB.Guest(guestNb)
-    ON DELETE SET NULL ON UPDATE CASCADE,
-    FOREIGN KEY (hotelNb, roomNb) REFERENCES HOTELDB.Room (hotelNb, roomNb)
-    ON DELETE NO ACTION ON UPDATE CASCADE,
-    CONSTRAINT date CHECK (dateTo >= dateFrom),
-    CONSTRAINT dateFrom CHECK (dateFrom >= current_date)
+CREATE TABLE TP3.Animal (
+    NoAnimal INT,
+    NoClinique VARCHAR,
+    Nom VARCHAR,
+    Type VARCHAR,
+    Espece VARCHAR,
+    Taille VARCHAR,
+    Poids VARCHAR,
+    Description VARCHAR,
+    DateNaissance VARCHAR,
+    Etat VARCHAR,
+    NoProprietaire INT,
+    FOREIGN KEY (NoClinique) REFERENCES Clinique(NoClinique),
+    FOREIGN KEY (NoProprietaire, NoClinique) REFERENCES ProprietaireAnimal(NoProprietaire, NoClinique),
+    UNIQUE (NoAnimal, NoClinique),
+    PRIMARY KEY (NoAnimal, NoClinique)
 );
+-- TODO poids, taille en nombre plutot que char
 
-ALTER TABLE HOTELDB.Guest ALTER gender DROP DEFAULT;
+CREATE TABLE TP3.Examen (
+    NoExamen INT,
+    Date DATE,
+    Heure TIME,
+    Description TEXT,
+    NID INT,
+    NoAnimal INT,
+    NoClinique VARCHAR,
+    PRIMARY KEY (NoExamen),
+    FOREIGN KEY (NID) REFERENCES Personnel(NID),
+    FOREIGN KEY (NoAnimal, NoClinique) REFERENCES Animal(NoAnimal, NoClinique)
+);
+CREATE TABLE TP3.PlanDeTraitement(
+    NoPlanTraitement INT,
+    NoExamen INT,
+    NoTraitement VARCHAR,
+    NoFacture INT,
+    QuantitéTraitement INT,
+    DateDebut DATE,
+    DateFin DATE,
+    PRIMARY KEY (NoPlanTraitement),
+    FOREIGN KEY (NoExamen) REFERENCES Examen(NoExamen),
+    FOREIGN KEY (NoTraitement) REFERENCES Traitement(NoTraitement),
+    FOREIGN KEY (NoFacture) REFERENCES Facture(NoFacture)
+);
