@@ -93,7 +93,7 @@ export class DatabaseService {
   }
 
 
-  public async deleteHotel(hotelNb: string): Promise<void>/*Promise<pg.QueryResult>*/ {
+  public async deleteHotel(clinicNb: string, animalNb: string): Promise<void>/*Promise<pg.QueryResult>*/ {
     // TO-DO
     
   }

@@ -3,7 +3,9 @@ import { Injectable } from "@angular/core";
 // tslint:disable-next-line:ordered-imports
 import { of, Observable, Subject } from "rxjs";
 import { catchError } from "rxjs/operators";
-import { Animal } from "../../../common/tables/Animal";
+import { Animal } from "../../../common/tables/animal";
+import { Receipt } from "../../../common/tables/receipt";
+import { Treatment } from "../../../common/tables/treatment";
 
 @Injectable()
 export class CommunicationService {
@@ -22,38 +24,56 @@ export class CommunicationService {
 
   public insertAnimal(animal: Animal): Observable<number> {
     return this.http
-      .post<number>(this.BASE_URL + "/hotels/insert", animal)
+      .post<number>(this.BASE_URL + "/animals/insert", animal)
       .pipe(catchError(this.handleError<number>("insertAnimal")));
   }
 
   public updateAnimal(animal: Animal): Observable<number> {
     return this.http
-      .put<number>(this.BASE_URL + "/hotels/update", animal)
+      .put<number>(this.BASE_URL + "/animals/update", animal)
       .pipe(catchError(this.handleError<number>("updateAnimal")));
   }
 
-  public deleteAnimal(clinicNb: string): Observable<number> {
+  public deleteAnimal(clinicNb: string, animalNb: string): Observable<number> {
     return this.http
-      .post<number>(this.BASE_URL + "/hotels/delete/" + clinicNb, {})
+      .post<number>(this.BASE_URL + `/animals/delete/${clinicNb}/${animalNb}`, {})
       .pipe(catchError(this.handleError<number>("deleteAnimal")));
+  }
+
+  public getAnimalsByOwnerAndClinic(clinicNb: string, ownerNb: string): Observable<Animal[]> {
+    return this.http
+      .get<Animal[]>(this.BASE_URL + `/guests/${clinicNb}/${ownerNb}`)
+      .pipe(catchError(this.handleError<Animal[]>("getAnimalsByOwnerAndClinic")));
+  }
+
+  public getAnimalsByClinic(clinicNb: string): Observable<Animal[]> {
+    return this.http
+      .get<Animal[]>(this.BASE_URL + `/guests/${clinicNb}`)
+      .pipe(catchError(this.handleError<Animal[]>("getAnimalsByClinic")));
   }
 
   public getClinicPKs(): Observable<string[]> {
     return this.http
-      .get<string[]>(this.BASE_URL + "/hotels/hotelNb")
+      .get<string[]>(this.BASE_URL + "/clinics/clinicNb")
       .pipe(catchError(this.handleError<string[]>("getClinicPKs")));
   }
 
-  public getOwners(clinicNb: string): Observable<string[]> {
+  public getOwnerPKs(clinicNb: string): Observable<string[]> {
     return this.http
-      .get<string[]>(this.BASE_URL + `/rooms?hotelNb=${clinicNb}`)
+      .get<string[]>(this.BASE_URL + `/owners/ownerNb/${clinicNb}`)
       .pipe(catchError(this.handleError<string[]>("getOwners")));
   }
 
-  public getAnimals(clinicNb: string, ownerNb: string): Observable<Animal[]> {
+  public getTreatments(clinicNb: string, animalNb: string): Observable<Treatment[]> {
     return this.http
-      .get<Animal[]>(this.BASE_URL + `/guests/${clinicNb}/${ownerNb}`)
-      .pipe(catchError(this.handleError<Animal[]>("getAnimals")));
+      .get<Treatment[]>(this.BASE_URL + `/treatments/${clinicNb}/${animalNb}`)
+      .pipe(catchError(this.handleError<Treatment[]>("getTreatments")));
+  }
+
+  public getReceipts(clinicNb: string, animalNb: string): Observable<Receipt[]> {
+    return this.http
+      .get<Receipt[]>(this.BASE_URL + `/receipts/${clinicNb}/${animalNb}`)
+      .pipe(catchError(this.handleError<Receipt[]>("getReceipts")));
   }
 
   private handleError<T>(

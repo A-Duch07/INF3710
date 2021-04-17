@@ -1,5 +1,5 @@
-import { Component, OnInit } from "@angular/core";
-import { Animal } from "../../../../common/tables/Animal";
+import { Component, ElementRef, OnInit, ViewChild } from "@angular/core";
+import { Animal } from "../../../../common/tables/animal";
 import { CommunicationService } from "../communication.service";
 
 @Component({
@@ -8,8 +8,8 @@ import { CommunicationService } from "../communication.service";
   styleUrls: ["./animal.component.css"],
 })
 export class AnimalComponent implements OnInit {
-  public clinicPKs: string[] = [];
-  public ownerNBs: string[] = [];
+  public clinicPKs: string[] = ["1", "2"];
+  public ownerNBs: string[] = ["3", "4"];
   public animals: Animal[] = [
     {
       animalnb : "1",
@@ -27,11 +27,19 @@ export class AnimalComponent implements OnInit {
     }
   ];
 
-  public duplicateError: boolean = false;
-  public invalidClinicPK: boolean = false;
+  @ViewChild("newAnimalName") public newAnimalName: ElementRef;
+  @ViewChild("newAnimalType") public newAnimalType: ElementRef;
+  @ViewChild("newAnimalSpecies") public newAnimalSpecies: ElementRef;
+  @ViewChild("newAnimalHeight") public newAnimalHeight: ElementRef;
+  @ViewChild("newAnimalWeight") public newAnimalWeight: ElementRef;
+  @ViewChild("newAnimalDescription") public newAnimalDescription: ElementRef;
+  @ViewChild("newAnimalDateOfBirth") public newAnimalDateOfBirth: ElementRef;
+  @ViewChild("newAnimalDateInscription") public newAnimalDateInscription: ElementRef;
+  @ViewChild("newAnimalState") public newAnimalState: ElementRef;
 
+  // public duplicateError: boolean = false;
+  // public invalidClinicPK: boolean = false;
   public selectedClinic: string = "-1";
-
   public selectedOwner: string = "-1";
 
   public constructor(private communicationService: CommunicationService) {}
@@ -40,13 +48,13 @@ export class AnimalComponent implements OnInit {
     this.communicationService.getClinicPKs().subscribe((clinicPKs: string[]) => {
       this.clinicPKs = clinicPKs;
       this.selectedClinic = this.clinicPKs[0];
-      this.getOwners();
+      this.getOwnerPKs();
     });
   }
 
   public updateSelectedClinic(clinicID: any): void {
     this.selectedClinic = this.clinicPKs[clinicID];
-    this.getOwners();
+    this.getOwnerPKs();
     this.refresh();
   }
 
@@ -55,9 +63,9 @@ export class AnimalComponent implements OnInit {
     this.refresh();
   }
 
-  public getOwners(): void {
+  public getOwnerPKs(): void {
     this.communicationService
-      .getOwners(this.selectedClinic)
+      .getOwnerPKs(this.selectedClinic)
       .subscribe((ownerNBs: string[]) => {
         this.ownerNBs = ownerNBs;
         this.selectedOwner = this.ownerNBs[0];
@@ -66,17 +74,26 @@ export class AnimalComponent implements OnInit {
 
   private refresh(): void {
     this.getAnimals();
+    this.newAnimalName.nativeElement.innerText = "";
+    this.newAnimalType.nativeElement.innerText = "";
+    this.newAnimalSpecies.nativeElement.innerText = "";
+    this.newAnimalHeight.nativeElement.innerText = "";
+    this.newAnimalWeight.nativeElement.innerText = "";
+    this.newAnimalDescription.nativeElement.innerText = "";
+    this.newAnimalDateOfBirth.nativeElement.innerText = "";
+    this.newAnimalDateInscription.nativeElement.innerText = "";
+    this.newAnimalState.nativeElement.innerText = "";
   }
 
   public getAnimals(): void {
     this.communicationService
-      .getAnimals(this.selectedClinic, this.selectedOwner)
+      .getAnimalsByOwnerAndClinic(this.selectedClinic, this.selectedOwner)
       .subscribe((animals: Animal[]) => {
         this.animals = animals;
       });
   }
 
-  public updateRoom(i: number) {
+  public updateAnimal(i: number): void {
     // this.communicationService
     //   .updateRoom(this.rooms[i])
     //   .subscribe((res: any) => {
@@ -84,17 +101,52 @@ export class AnimalComponent implements OnInit {
     //   });
   }
 
-  public changeRoomType(event: any, i: number) {
-    // const editField = event.target.textContent;
-    // this.rooms[i].type = editField;
+  public changeAnimalName(event: any, i: number): void {
+    const editField: any = event.target.textContent;
+    this.animals[i].name = editField;
   }
 
-  public changeRoomPrice(event: any, i: number) {
-    // const editField = event.target.textContent;
-    // this.rooms[i].price = editField;
+  public changeAnimalType(event: any, i: number): void {
+    const editField: any = event.target.textContent;
+    this.animals[i].type = editField;
   }
 
-  public deleteRoom(hotelNb: string, roomNb: string) {
+  public changeAnimalSpecies(event: any, i: number): void {
+    const editField: any = event.target.textContent;
+    this.animals[i].species = editField;
+  }
+
+  public changeAnimalSize(event: any, i: number): void {
+    const editField: any = event.target.textContent;
+    this.animals[i].size = editField;
+  }
+
+  public changeAnimalWeight(event: any, i: number): void {
+    const editField: any = event.target.textContent;
+    this.animals[i].weight = editField;
+  }
+
+  public changeAnimalDescription(event: any, i: number): void {
+    const editField: any = event.target.textContent;
+    this.animals[i].description = editField;
+  }
+
+  public changeAnimalDateOfBirth(event: any, i: number): void {
+    const editField: any = event.target.textContent;
+    this.animals[i].dateofbirth = editField;
+  }
+
+  public changeAnimalDateInscription(event: any, i: number): void {
+    const editField: any = event.target.textContent;
+    this.animals[i].dateinscription = editField;
+  }
+
+  public changeAnimalState(event: any, i: number): void {
+    const editField: any = event.target.textContent;
+    this.animals[i].state = editField;
+  }
+
+  public deleteAnimal(hotelNb: string, roomNb: string): void {
     // this.communicationService
     //   .deleteRoom(hotelNb, roomNb)
     //   .subscribe((res: any) => {
@@ -102,7 +154,7 @@ export class AnimalComponent implements OnInit {
     //   });
   }
 
-  public insertRoom(): void {
+  public insertAnimal(): void {
     // const room: Room = {
     //   hotelnb: this.selectedHotel,
     //   roomnb: this.newRoomNb.nativeElement.innerText,

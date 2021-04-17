@@ -1,4 +1,7 @@
-import { Component, ElementRef, ViewChild } from "@angular/core";
+import { Component } from "@angular/core";
+import { Animal } from "../../../../common/tables/animal";
+import { Receipt } from "../../../../common/tables/receipt";
+import { CommunicationService } from "../communication.service";
 
 @Component({
   selector: "app-hotel",
@@ -6,67 +9,55 @@ import { Component, ElementRef, ViewChild } from "@angular/core";
   styleUrls: ["./receipt.component.css"],
 })
 export class ReceiptComponent {
-  @ViewChild("newHotelNb") public newHotelNb: ElementRef;
-  @ViewChild("newHotelName") public newHotelName: ElementRef;
-  @ViewChild("newHotelCity") public newHotelCity: ElementRef;
+  public clinicPKs: string[] = [];
+  public animals: Animal[] = [];
+  public receipts: Receipt[] = [];
 
-  // public hotels: Hotel[] = [];
   // public duplicateError: boolean = false;
+  // public invalidHotelPK: boolean = false;
 
-  // public constructor(private communicationService: CommunicationService) {}
+  public selectedClinic: string = "-1";
+  public selectedAnimal: string = "-1";
 
-  // public ngOnInit(): void {
-  //   this.getHotels();
-  // }
+  public constructor(private communicationService: CommunicationService) {}
 
-  // public getHotels(): void {
-  //   this.communicationService.getHotels().subscribe((hotels: Hotel[]) => {
-  //     this.hotels = hotels;
-  //   });
-  // }
+  public ngOnInit(): void {
+    this.communicationService.getClinicPKs().subscribe((clinicPKs: string[]) => {
+      this.clinicPKs = clinicPKs;
+      this.selectedClinic = this.clinicPKs[0];
+      this.getAnimals();
+    });
+  }
 
-  // public insertHotel(): void {
-  //   const hotel: any = {
-  //     hotelnb: this.newHotelNb.nativeElement.innerText,
-  //     name: this.newHotelName.nativeElement.innerText,
-  //     city: this.newHotelCity.nativeElement.innerText,
-  //   };
+  public updateSelectedClinic(clinicID: any): void {
+    this.selectedClinic = this.clinicPKs[clinicID];
+    this.getAnimals();
+    this.refresh();
+  }
 
-  //   this.communicationService.insertHotel(hotel).subscribe((res: number) => {
-  //     if (res > 0) {
-  //       this.communicationService.filter("update");
-  //     }
-  //     this.refresh();
-  //     this.duplicateError = res === -1;
-  //   });
-  // }
+  public updateSelectedAnimal(animalID: any): void {
+    this.selectedAnimal = this.animals[animalID].animalnb;
+    this.refresh();
+  }
 
-  // private refresh() {
-  //   this.getHotels();
-  //   this.newHotelNb.nativeElement.innerText = "";
-  //   this.newHotelName.nativeElement.innerText = "";
-  //   this.newHotelCity.nativeElement.innerText = "";
-  // }
+  public getAnimals(): void {
+    this.communicationService
+      .getAnimalsByClinic(this.selectedClinic)
+      .subscribe((animals: Animal[]) => {
+        this.animals = animals;
+        this.selectedAnimal = animals[0].animalnb;
+      });
+  }
 
-  // public deleteHotel(hotelNb: string) {
-  //   this.communicationService.deleteHotel(hotelNb).subscribe((res: any) => {
-  //     this.refresh();
-  //   });
-  // }
+  public getReceipts(): void {
+    this.communicationService
+      .getReceipts(this.selectedClinic, this.selectedAnimal)
+      .subscribe((receipts: Receipt[]) => {
+        this.receipts = receipts;
+      });
+  }
 
-  // public changeHotelName(event: any, i:number){
-  //   const editField = event.target.textContent;
-  //   this.hotels[i].name = editField;
-  // }
-
-  // public changeHotelCity(event: any, i:number){
-  //   const editField = event.target.textContent;
-  //   this.hotels[i].city = editField;
-  // }
-
-  // public updateHotel(i: number) {
-  //   this.communicationService.updateHotel(this.hotels[i]).subscribe((res: any) => {
-  //     this.refresh();
-  //   });
-  // }
+  private refresh(): void {
+    this.getReceipts();
+  }
 }

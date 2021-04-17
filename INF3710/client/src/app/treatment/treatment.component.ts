@@ -1,5 +1,7 @@
-import { Component, ElementRef, ViewChild } from "@angular/core";
-// import { CommunicationService } from "../communication.service";
+import { Component, OnInit } from "@angular/core";
+import { Animal } from "../../../../common/tables/animal";
+import { Treatment } from "../../../../common/tables/treatment";
+import { CommunicationService } from "../communication.service";
 
 @Component({
   selector: "app-room",
@@ -7,84 +9,55 @@ import { Component, ElementRef, ViewChild } from "@angular/core";
   styleUrls: ["./treatment.component.css"],
 })
 
-export class TreatmentComponent {
-  public hotelPKs: string[] = [];
-  public rooms: string[] = [];
-  public duplicateError: boolean = false;
-  public invalidHotelPK: boolean = false;
-  public selectedHotel: string = "-1";
+export class TreatmentComponent implements OnInit {
+  public clinicPKs: string[] = [];
+  public animals: Animal[] = [];
+  public treatments: Treatment[] = [];
+  // public duplicateError: boolean = false;
+  // public invalidHotelPK: boolean = false;
+  
+  public selectedClinic: string = "-1";
+  public selectedAnimal: string = "-1";
 
-  @ViewChild("newRoomNb") public newRoomNb: ElementRef;
-  @ViewChild("newRoomType") public newRoomType: ElementRef;
-  @ViewChild("newRoomPrice") public newRoomPrice: ElementRef;
+  public constructor(private communicationService: CommunicationService) {}
 
-  public constructor(/*private communicationService: CommunicationService*/) {}
+  public ngOnInit(): void {
+    this.communicationService.getClinicPKs().subscribe((clinicPKs: string[]) => {
+      this.clinicPKs = clinicPKs;
+      this.selectedClinic = this.clinicPKs[0];
+      this.getAnimals();
+    });
+  }
 
-  // public ngOnInit(): void {
-  //   this.communicationService.getClinicPKs().subscribe((clinicPKs: string[]) => {
-  //     this.hotelPKs = clinicPKs;
-  //     this.selectedHotel = this.hotelPKs[0];
-  //     this.getRooms();
-  //   });
-  // }
+  public updateSelectedClinic(clinicID: any): void {
+    this.selectedClinic = this.clinicPKs[clinicID];
+    this.getAnimals();
+    this.refresh();
+  }
 
-  // public updateSelectedHotel(hotelID: any) {
-  //   this.selectedHotel = this.hotelPKs[hotelID];
-  //   this.getRooms();
-  //   this.refresh();
-  // }
+  public updateSelectedAnimal(animalID: any): void {
+    this.selectedAnimal = this.animals[animalID].animalnb;
+    this.refresh();
+  }
 
-  // public getRooms(): void {
-  //   this.communicationService
-  //     .getOwners(this.selectedHotel)
-  //     .subscribe((rooms: string[]) => {
-  //       this.rooms = rooms;
-  //     });
-  // }
+  public getAnimals(): void {
+    this.communicationService
+      .getAnimalsByClinic(this.selectedClinic)
+      .subscribe((animals: Animal[]) => {
+        this.animals = animals;
+        this.selectedAnimal = animals[0].animalnb;
+      });
+  }
 
-  // private refresh() {
-  //   this.getRooms();
-  //   this.newRoomNb.nativeElement.innerText = "";
-  //   this.newRoomType.nativeElement.innerText = "";
-  //   this.newRoomPrice.nativeElement.innerText = "";
-  // }
+  public getTreatments(): void {
+    this.communicationService
+      .getTreatments(this.selectedClinic, this.selectedAnimal)
+      .subscribe((treatments: Treatment[]) => {
+        this.treatments = treatments;
+      });
+  }
 
-  // public changeRoomType(event: any, i: number) {
-  //   // const editField = event.target.textContent;
-  //   // this.rooms[i].type = editField;
-  // }
-
-  // public changeRoomPrice(event: any, i: number) {
-  //   // const editField = event.target.textContent;
-  //   // this.rooms[i].price = editField;
-  // }
-
-  // public deleteRoom(hotelNb: string, roomNb: string) {
-  //   this.communicationService
-  //     .deleteRoom(hotelNb, roomNb)
-  //     .subscribe((res: any) => {
-  //       this.refresh();
-  //     });
-  // }
-
-  // public insertRoom(): void {
-  //   const room: Room = {
-  //     hotelnb: this.selectedHotel,
-  //     roomnb: this.newRoomNb.nativeElement.innerText,
-  //     type: this.newRoomType.nativeElement.innerText,
-  //     price: this.newRoomPrice.nativeElement.innerText,
-  //   };
-
-  //   this.communicationService.insertRoom(room).subscribe((res: number) => {
-  //     this.refresh();
-  //   });
-  // }
-
-  // public updateRoom(i: number) {
-  //   // this.communicationService
-  //   //   .updateRoom(this.rooms[i])
-  //   //   .subscribe((res: any) => {
-  //   //     this.refresh();
-  //   //   });
-  // }
+  private refresh(): void {
+    this.getTreatments();
+  }
 }

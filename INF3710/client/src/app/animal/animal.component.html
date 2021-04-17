@@ -67,21 +67,19 @@
       <th class="actionCell">ACTION</th>
     </thead>
     <tbody>
-      <tr *ngFor="let animal of animals">
+      <tr *ngFor="let animal of animals; let i = index">
         <td class="contentCell">{{ animal.animalnb }}</td>
         <td class="contentCell">{{ animal.clinicnb }}</td>
         <td class="contentCell">{{ animal.ownernb }}</td>
-        <!-- <td class="contentCell" contenteditable="true" (blur)="changeRoomType($event, i)">{{ room.type }}</td>
-        <td class="contentCell" contenteditable="true" (blur)="changeRoomPrice($event, i)">{{ room.price }}</td> -->
-        <td class="contentCell">{{ animal.name }}</td>
-        <td class="contentCell">{{ animal.type }}</td>
-        <td class="contentCell">{{ animal.species }}</td>
-        <td class="contentCell">{{ animal.size }}</td>
-        <td class="contentCell">{{ animal.weight }}</td>
-        <td class="contentCell">{{ animal.description }}</td>
-        <td class="contentCell">{{ animal.dateofbirth }}</td>
-        <td class="contentCell">{{ animal.dateinscription }}</td>
-        <td class="contentCell">{{ animal.state }}</td>
+        <td class="contentCell" contenteditable="true" (blur)="changeAnimalName($event, i)">{{ animal.name }}</td>
+        <td class="contentCell" contenteditable="true" (blur)="changeAnimalType($event, i)">{{ animal.type }}</td>
+        <td class="contentCell" contenteditable="true" (blur)="changeAnimalSpecies($event, i)">{{ animal.species }}</td>
+        <td class="contentCell" contenteditable="true" (blur)="changeAnimalSize($event, i)">{{ animal.size }}</td>
+        <td class="contentCell" contenteditable="true" (blur)="changeAnimalWeight($event, i)">{{ animal.weight }}</td>
+        <td class="contentCell" contenteditable="true" (blur)="changeAnimalDescription($event, i)">{{ animal.description }}</td>
+        <td class="contentCell" contenteditable="true" (blur)="changeAnimalDateOfBirth($event, i)">{{ animal.dateofbirth }}</td>
+        <td class="contentCell" contenteditable="true" (blur)="changeAnimalDateInscription($event, i)">{{ animal.dateinscription }}</td>
+        <td class="contentCell" contenteditable="true" (blur)="changeAnimalState($event, i)">{{ animal.state }}</td>
         <td class="actionCell">
           <button type="button" class="submitbtn" (click)="updateRoom(i)"> <i class="fa fa-edit"></i></button>
           <button type="button" class="deletebtn" (click)="deleteRoom(room.hotelnb, room.roomnb)">
@@ -93,15 +91,15 @@
         <td class="contentCell">?</td>
         <td class="contentCell">{{selectedClinic}}</td>
         <td class="contentCell">{{selectedOwner}}</td>
-        <td class="contentCell" contenteditable="true" placeholder="New Price" #newRoomPrice></td>
-        <td class="contentCell" contenteditable="true" placeholder="New Number" #newRoomNb></td>
-        <td class="contentCell" contenteditable="true" placeholder="New Type" #newRoomType></td>
-        <td class="contentCell" contenteditable="true" placeholder="New Price" #newRoomPrice></td>
-        <td class="contentCell" contenteditable="true" placeholder="New Number" #newRoomNb></td>
-        <td class="contentCell" contenteditable="true" placeholder="New Type" #newRoomType></td>
-        <td class="contentCell" contenteditable="true" placeholder="New Price" #newRoomPrice></td>
-        <td class="contentCell" contenteditable="true" placeholder="New Number" #newRoomNb></td>
-        <td class="contentCell" contenteditable="true" placeholder="New Type" #newRoomType></td>
+        <td class="contentCell" contenteditable="true" #newAnimalName></td>
+        <td class="contentCell" contenteditable="true" #newAnimalType></td>
+        <td class="contentCell" contenteditable="true" #newAnimalSpecies></td>
+        <td class="contentCell" contenteditable="true" #newAnimalHeight></td>
+        <td class="contentCell" contenteditable="true" #newAnimalWeight></td>
+        <td class="contentCell" contenteditable="true" #newAnimalDescription></td>
+        <td class="contentCell" contenteditable="true" #newAnimalDateOfBirth></td>
+        <td class="contentCell" contenteditable="true" #newAnimalDateInscription></td>
+        <td class="contentCell" contenteditable="true" #newAnimalState></td>
         <td class="contentCell"></td>
       </tr>
     </tbody>
