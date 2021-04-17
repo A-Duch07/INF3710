@@ -9,6 +9,7 @@ import { Treatment } from "../../../common/tables/treatment";
 
 @Injectable()
 export class CommunicationService {
+
   private readonly BASE_URL: string = "http://localhost:3000/database";
   public constructor(private http: HttpClient) {}
 
@@ -42,13 +43,13 @@ export class CommunicationService {
 
   public getAnimalsByOwnerAndClinic(clinicNb: string, ownerNb: string): Observable<Animal[]> {
     return this.http
-      .get<Animal[]>(this.BASE_URL + `/guests/${clinicNb}/${ownerNb}`)
+      .get<Animal[]>(this.BASE_URL + `/animals/${clinicNb}/${ownerNb}`)
       .pipe(catchError(this.handleError<Animal[]>("getAnimalsByOwnerAndClinic")));
   }
 
   public getAnimalsByClinic(clinicNb: string): Observable<Animal[]> {
     return this.http
-      .get<Animal[]>(this.BASE_URL + `/guests/${clinicNb}`)
+      .get<Animal[]>(this.BASE_URL + `/animals/${clinicNb}`)
       .pipe(catchError(this.handleError<Animal[]>("getAnimalsByClinic")));
   }
 
@@ -62,6 +63,12 @@ export class CommunicationService {
     return this.http
       .get<string[]>(this.BASE_URL + `/owners/ownerNb/${clinicNb}`)
       .pipe(catchError(this.handleError<string[]>("getOwners")));
+  }
+
+  public getAnimalsByName(event: any) : Observable<Animal[]> {
+    return this.http
+      .get<Animal[]>(this.BASE_URL + `/animals/namesearch/${event}`)
+      .pipe(catchError(this.handleError<Animal[]>("getOwners")));
   }
 
   public getTreatments(clinicNb: string, animalNb: string): Observable<Treatment[]> {

@@ -8,37 +8,20 @@ import { CommunicationService } from "../communication.service";
   styleUrls: ["./animal.component.css"],
 })
 export class AnimalComponent implements OnInit {
-  public clinicPKs: string[] = ["1", "2"];
-  public ownerNBs: string[] = ["3", "4"];
-  public animals: Animal[] = [
-    {
-      animalnb : "1",
-      clinicnb : "2",
-      ownernb : "3",
-      name : "rex",
-      type : "chien",
-      species : "berger allemand",
-      size : "160 cm",
-      weight : "180 lbs",
-      description : "description",
-      dateofbirth : "7 aout",
-      dateinscription : "8 aout",
-      state : "mort",
-    }
-  ];
+  public clinicPKs: string[] = [];
+  public ownerNBs: string[] = [];
+  public animals: Animal[] = [];
 
   @ViewChild("newAnimalName") public newAnimalName: ElementRef;
   @ViewChild("newAnimalType") public newAnimalType: ElementRef;
   @ViewChild("newAnimalSpecies") public newAnimalSpecies: ElementRef;
-  @ViewChild("newAnimalHeight") public newAnimalHeight: ElementRef;
+  @ViewChild("newAnimalHeight") public newAnimalSize: ElementRef;
   @ViewChild("newAnimalWeight") public newAnimalWeight: ElementRef;
   @ViewChild("newAnimalDescription") public newAnimalDescription: ElementRef;
   @ViewChild("newAnimalDateOfBirth") public newAnimalDateOfBirth: ElementRef;
   @ViewChild("newAnimalDateInscription") public newAnimalDateInscription: ElementRef;
   @ViewChild("newAnimalState") public newAnimalState: ElementRef;
 
-  // public duplicateError: boolean = false;
-  // public invalidClinicPK: boolean = false;
   public selectedClinic: string = "-1";
   public selectedOwner: string = "-1";
 
@@ -54,8 +37,7 @@ export class AnimalComponent implements OnInit {
 
   public updateSelectedClinic(clinicID: any): void {
     this.selectedClinic = this.clinicPKs[clinicID];
-    this.getOwnerPKs();
-    this.refresh();
+    this.getOwnerPKs(); 
   }
 
   public updateSelectedOwner(ownerID: any): void {
@@ -69,6 +51,7 @@ export class AnimalComponent implements OnInit {
       .subscribe((ownerNBs: string[]) => {
         this.ownerNBs = ownerNBs;
         this.selectedOwner = this.ownerNBs[0];
+        this.refresh();
       });
   }
 
@@ -88,6 +71,14 @@ export class AnimalComponent implements OnInit {
   public getAnimals(): void {
     this.communicationService
       .getAnimalsByOwnerAndClinic(this.selectedClinic, this.selectedOwner)
+      .subscribe((animals: Animal[]) => {
+        this.animals = animals;
+      });
+  }
+
+  updateTextboxSearch(event:string):void {
+    this.communicationService
+      .getAnimalsByName(event)
       .subscribe((animals: Animal[]) => {
         this.animals = animals;
       });
@@ -161,6 +152,21 @@ export class AnimalComponent implements OnInit {
     //   type: this.newRoomType.nativeElement.innerText,
     //   price: this.newRoomPrice.nativeElement.innerText,
     // };
+   
+    const animal: Animal = {
+      animalnb: "test",
+      clinicnb: this.selectedClinic,
+      ownernb: this.selectedOwner,
+      name: this.newAnimalName.nativeElement.innerText,
+      type: this.newAnimalType.nativeElement.innerText,
+      species: this.newAnimalSpecies.nativeElement.innerText,
+      size: this.newAnimalS.nativeElement.innerText,
+      weight: this.newAnimalWeight.nativeElement.innerText,
+      description: this.newAnimalDescription.nativeElement.innerText,
+      dateofbirth: this.newAnimalDateOfBirth.nativeElement.innerText,
+      dateinscription: this.newAnimalDateInscription.nativeElement.innerText,
+      state: this.newAnimalState.nativeElement.innerText,
+    }
 
     // this.communicationService.insertRoom(room).subscribe((res: number) => {
     //   this.refresh();

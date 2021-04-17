@@ -1,33 +1,101 @@
 import { injectable } from "inversify";
 import * as pg from "pg";
 import "reflect-metadata";
-// import { Room } from "../../../common/tables/Room";
-// import { Hotel } from "../../../common/tables/Hotel";
-// import { Gender, Guest } from "../../../common/tables/Guest";
 
 @injectable()
 export class DatabaseService {
+  
 
-  // TODO: A MODIFIER POUR VOTRE BD
+
   public connectionConfig: pg.ConnectionConfig = {
-    user: "postgres",
-    database: "TP3",
-    password: "admin",
-    port: 5432,
-    host: "127.0.0.1",
-    keepAlive: true
+    connectionString: 'postgresql://postgres:changeme@127.0.0.1:5432/TP3',
+    keepAlive: true,
+    connectionTimeoutMillis: 1000,
+    query_timeout: 1000,
+    statement_timeout: 1000,
   };
 
-  public pool: pg.Pool = new pg.Pool(this.connectionConfig);
+  public pool: pg.Pool;
 
-  // ======= DEBUG =======
-  public async getAllFromTable(tableName: string): Promise<pg.QueryResult> {
-    const client = await this.pool.connect();
-    const res = await client.query(`SELECT * FROM TP3.${tableName};`);
-    client.release();
-    return res;
+  constructor(){
+    this.pool = new pg.Pool(this.connectionConfig);
   }
 
+  // ======= DEBUG =======
+  public async getAllFromTable(tableName: string): Promise<pg.QueryResult|undefined> {
+    try {
+      const client = await this.pool.connect();
+      const res = client.query(`SELECT * FROM TP3.${tableName};`);
+      client.release()
+      return res;
+    } catch(e) {
+      console.error(e);
+    }
+    return undefined;
+  }
+
+
+  public async getAnimalsByClinic(clinicNb: string):Promise<pg.QueryResult|undefined> {
+    try {
+      const client = await this.pool.connect();
+      const res = client.query(`SELECT * FROM TP3.Animal WHERE NoClinique='${clinicNb}';`);
+      client.release();
+      return res;
+    } catch(e) {
+      console.error(e);
+    }
+    return undefined;
+  }
+
+  public async getAnimalsByOwnerAndClinic(clinicNb: string, ownerNb: string):Promise<pg.QueryResult|undefined> {
+    try {
+      // http://localhost:3000/database/animals/C01/33
+      const client = await this.pool.connect();
+      const res = client.query(`SELECT * FROM TP3.Animal WHERE NoClinique='${clinicNb}' AND NoProprietaire=${ownerNb};`);
+      client.release();
+      return res;
+    } catch(e) {
+      console.error(e);
+    }
+    return undefined;
+  }
+
+  public async getAnimalsByText(text: string):Promise<pg.QueryResult|undefined> {
+    try {
+      // http://localhost:3000/database/animals/C01/33
+      const client = await this.pool.connect();
+      const res = client.query(`SELECT * FROM TP3.Animal WHERE Nom LIKE '%${text}%'`);
+      client.release();
+      return res;
+    } catch(e) {
+      console.error(e);
+    }
+    return undefined;
+  }
+
+  public async getClinicPKs():Promise<pg.QueryResult|undefined> {
+    try {
+      const client = await this.pool.connect();
+      const res = client.query('SELECT NoClinique FROM TP3.Clinique;');
+      client.release();
+      return res;
+    } catch(e) {
+      console.error(e);
+    }
+    return undefined;
+  }
+  public async getOwnerPKsFromClinic( clinicID:string):Promise<pg.QueryResult|undefined> {
+    try {
+      const client = await this.pool.connect();
+      const res = client.query(`SELECT NoProprietaire FROM TP3.ProprietaireAnimal WHERE NoClinique='${clinicID}';`);
+      client.release();
+      return res;
+    } catch(e) {
+      console.error(e);
+    }
+    return undefined;
+
+  }
 
   // // ======= HOTEL =======
   // public async createHotel(hotel: Hotel): Promise<pg.QueryResult> {

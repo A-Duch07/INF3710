@@ -4,7 +4,7 @@
   "version": "1.1.0",
   "private": true,
   "scripts": {
-    "start": "tsc && concurrently --kill-others \"tsc -w \" \"nodemon out/server/app/www.js\" ",
+    "start": "tsc && concurrently --kill-others \"tsc -w \" \"node out/server/app/www.js\" ",
     "lint": "tslint --project tsconfig.json \"./app/**/*.ts\" --format stylish",
     "test": "mocha",
     "coverage": "nyc mocha",
@@ -48,7 +48,7 @@
     "inversify": "^4.13.0",
     "morgan": "^1.9.1",
     "nodemon": "^1.18.9",
-    "pg": "^7.18.2",
+    "pg": "^8.6.0",
     "pg-promise": "^10.9.2",
     "reflect-metadata": "^0.1.10",
     "serve-favicon": "~2.5.0",

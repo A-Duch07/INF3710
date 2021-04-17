@@ -12,7 +12,7 @@
         class="custom-input"
         placeholder="Veuillez écrire le nom de votre animal ..."
         id="animalInput"
-        (change)="updateSelectedHotel($event.target.options.selectedIndex)"
+        (input)="updateTextboxSearch($event.target.value)"
       >
       <button class="search-button">
         Rechercher
@@ -94,7 +94,7 @@
         <td class="contentCell" contenteditable="true" #newAnimalName></td>
         <td class="contentCell" contenteditable="true" #newAnimalType></td>
         <td class="contentCell" contenteditable="true" #newAnimalSpecies></td>
-        <td class="contentCell" contenteditable="true" #newAnimalHeight></td>
+        <td class="contentCell" contenteditable="true" #newAnimalSize></td>
         <td class="contentCell" contenteditable="true" #newAnimalWeight></td>
         <td class="contentCell" contenteditable="true" #newAnimalDescription></td>
         <td class="contentCell" contenteditable="true" #newAnimalDateOfBirth></td>
