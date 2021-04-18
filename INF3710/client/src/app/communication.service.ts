@@ -10,6 +10,7 @@ import { Treatment } from "../../../common/tables/treatment";
 @Injectable()
 export class CommunicationService {
 
+
   private readonly BASE_URL: string = "http://localhost:3000/database";
   public constructor(private http: HttpClient) {}
 
@@ -59,6 +60,12 @@ export class CommunicationService {
       .pipe(catchError(this.handleError<string[]>("getClinicPKs")));
   }
 
+  public getExamensPKs(): Observable<string[]> {
+    return this.http
+      .get<string[]>(this.BASE_URL + "/exams/")
+      .pipe(catchError(this.handleError<string[]>("getExamensPKs")));
+  }
+
   public getOwnerPKs(clinicNb: string): Observable<string[]> {
     return this.http
       .get<string[]>(this.BASE_URL + `/owners/ownerNb/${clinicNb}`)
@@ -77,9 +84,15 @@ export class CommunicationService {
       .pipe(catchError(this.handleError<Treatment[]>("getTreatments")));
   }
 
-  public getReceipts(clinicNb: string, animalNb: string): Observable<Receipt[]> {
+  public getReceipts(): Observable<Receipt[]> {
     return this.http
-      .get<Receipt[]>(this.BASE_URL + `/receipts/${clinicNb}/${animalNb}`)
+      .get<Receipt[]>(this.BASE_URL + `/receipt/`)
+      .pipe(catchError(this.handleError<Receipt[]>("getReceipts")));
+  }
+
+  public generateReceipts( num:string): Observable<Receipt[]> {
+    return this.http
+      .get<Receipt[]>(this.BASE_URL + `/receipt/generate/${num}`)
       .pipe(catchError(this.handleError<Receipt[]>("getReceipts")));
   }
 

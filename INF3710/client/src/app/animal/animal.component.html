@@ -14,9 +14,6 @@
         id="animalInput"
         (input)="updateTextboxSearch($event.target.value)"
       >
-      <button class="search-button">
-        Rechercher
-      </button>
     </div>
   </div>
 
@@ -81,14 +78,14 @@
         <td class="contentCell" contenteditable="true" (blur)="changeAnimalDateInscription($event, i)">{{ animal.dateinscription }}</td>
         <td class="contentCell" contenteditable="true" (blur)="changeAnimalState($event, i)">{{ animal.state }}</td>
         <td class="actionCell">
-          <button type="button" class="submitbtn" (click)="updateRoom(i)"> <i class="fa fa-edit"></i></button>
-          <button type="button" class="deletebtn" (click)="deleteRoom(room.hotelnb, room.roomnb)">
+          <button type="button" class="submitbtn" (click)="updateAnimal(i)"> <i class="fa fa-edit"></i></button>
+          <button type="button" class="deletebtn" (click)="deleteAnimal(animal.clinicnb, animal.animalnb)">
             <i class="fa fa-trash-o"></i>
           </button>
         </td>
       </tr>
       <tr class="blank_row">
-        <td class="contentCell">?</td>
+        <td class="contentCell" contenteditable="true" #newAnimalNumber></td>
         <td class="contentCell">{{selectedClinic}}</td>
         <td class="contentCell">{{selectedOwner}}</td>
         <td class="contentCell" contenteditable="true" #newAnimalName></td>
@@ -105,5 +102,5 @@
     </tbody>
   </table>
 
-  <button type="button" class="btn" (click)="insertRoom()">+</button>
+  <button type="button" class="btn" (click)="insertAnimal()">+</button>
 </div>

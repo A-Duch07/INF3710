@@ -6,27 +6,18 @@
   <div class="container contentSelect">
     <div class="input-group mb-3">
       <div class="input-group-prepend">
-        <label class="input-group-text" for="clinicSelect">Clinique</label>
+        <label class="input-group-text" for="clinicSelect">NoExamen</label>
       </div>
       <select
         class="custom-select"
         id="clinicSelect"
-        (change)="updateSelectedClinic($event.target.options.selectedIndex)"
+        (change)="updateSelectedExam($event.target.options.selectedIndex)"
       >
-        <option *ngFor="let clinic of clinicPKs">{{ clinic }}</option>
+        <option *ngFor="let clinic of examensPKs">{{ clinic }}</option>
       </select>
+      <button (click)="generateReceipt()">Génerer facture pour examen</button>
     </div>
-  </div>
-
-  <div class="container contentSelect">
-    <div class="input-group mb-3">
-      <div class="input-group-prepend">
-        <label class="input-group-text" for="animalSelect">Animal</label>
-      </div>
-      <select class="custom-select" id="animalSelect" (change)="updateSelectedAnimal($event.target.options.selectedIndex)">
-        <option *ngFor="let animal of animals">{{ animal.animalnb }}</option>
-      </select>
-    </div>
+    <p>Une facture ne peut être généré que suite à un examen, le coût d'une facture correspond à tout les traitements qui lui sont préscrit dans le plan de traitement attaché</p>
   </div>
 
   <table id="ht" align="center" border="1" width="1000" class="table-striped table-hover">
@@ -37,10 +28,11 @@
       <th class="actionCell">STATUS</th>
     </thead>
     <tbody>
-      <tr *ngFor="let hotel of hotels; let i = index">
-        <td class="contentCell">{{ hotel.hotelnb }}</td>
-        <td class="contentCell" contenteditable="true" (blur)="changeHotelName($event, i)">{{ hotel.name}}</td>
-        <td class="contentCell" contenteditable="true" (blur)="changeHotelCity($event, i)">{{ hotel.city }}</td>
+      <tr *ngFor="let receipt of receipts; let i = index">
+        <td class="contentCell">{{ receipt.receiptnb }}</td>
+        <td class="contentCell">{{ receipt.date }}</td>
+        <td class="contentCell">{{ receipt.totalcost}} $</td>
+        <td class="contentCell">{{ receipt.Status ? receipt.Status : 'Non payé'}}</td>
       </tr>
     </tbody>
   </table>

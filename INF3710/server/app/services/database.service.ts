@@ -5,9 +5,9 @@ import { Animal } from "../../../common/tables/animal";
 
 @injectable()
 export class DatabaseService {
-
+  
   public connectionConfig: pg.ConnectionConfig = {
-    connectionString: 'postgresql://postgres:admin@127.0.0.1:5432/TP3',
+    connectionString: 'postgresql://postgres:changeme@127.0.0.1:5432/TP3',
     keepAlive: true,
     statement_timeout: 1000,
   };
@@ -88,7 +88,65 @@ export class DatabaseService {
       console.error(e);
     }
     return undefined;
+  }
 
+  public async getTreatmentByAnimal(clinicNb: string, animalNb: string):Promise<pg.QueryResult|undefined> {
+    try {
+      const client: pg.PoolClient = await this.pool.connect();
+      const query = `SELECT NoTraitement, DescriptionTraitement, Cout FROM TP3.PlanDeTraitement NATURAL JOIN TP3.Traitement NATURAL JOIN TP3.Examen NATURAL JOIN TP3.Animal WHERE Animal.noanimal=${animalNb} AND Animal.noclinique='${clinicNb}';`
+      const res: any = client.query(query);
+      client.release();
+      return res;
+    } catch(e) {
+      console.error(e);
+    }
+    return undefined;
+  }
+
+  public async getExamPKs():Promise<pg.QueryResult|undefined> {
+    try {
+      const client: pg.PoolClient = await this.pool.connect();
+      const res: any = client.query('SELECT NoExamen FROM TP3.Examen;');
+      client.release();
+      return res;
+    } catch(e) {
+      console.error(e);
+    }
+    return undefined;
+  }
+
+  public async getReceipts():Promise<pg.QueryResult|undefined> {
+    try {
+      const client: pg.PoolClient = await this.pool.connect();
+      const res: any = client.query('SELECT * FROM TP3.Facture;');
+      client.release();
+      return res;
+    } catch(e) {
+      console.error(e);
+    }
+    return undefined;
+  }
+
+  public async generateReceipt(noExam:string):Promise<pg.QueryResult|undefined> {
+    try {
+      const client: pg.PoolClient = await this.pool.connect();
+      const query = `
+      INSERT INTO TP3.Facture(Date,TotalPaye,Paye,NoProprietaire,NoVeterinaire,NoClinique) VALUES
+        (NOW(),
+        (SELECT SUM(cout) FROM TP3.PlanDeTraitement NATURAL JOIN TP3.Traitement NATURAL JOIN TP3.Examen WHERE NoExamen=${noExam}),
+        NULL,
+        (SELECT NoProprietaire FROM TP3.Animal WHERE Animal.noanimal=(SELECT NoAnimal FROM TP3.Examen WHERE NoExamen=${noExam}) AND NoClinique = (SELECT NoClinique FROM TP3.Examen WHERE NoExamen=${noExam})) ,
+        (SELECT NID FROM TP3.Examen WHERE NoExamen=${noExam}),
+        (SELECT NoClinique FROM TP3.Examen WHERE NoExamen=${noExam})
+      );
+      `
+      const res: any = client.query(query);
+      client.release();
+      return res;
+    } catch(e) {
+      console.error(e);
+    }
+    return undefined;
   }
 
   public async insertAnimal(animal: Animal): Promise<pg.QueryResult> {
@@ -115,6 +173,48 @@ export class DatabaseService {
     const queryText: string = `INSERT INTO TP3.Animal VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12);`;
 
     const res: any = await client.query(queryText, values);
+    client.release();
+    return res;
+  }
+
+  public async deleteAnimal(clinicNb: string, animalNb: string): Promise<pg.QueryResult|undefined> {
+    try {
+      if (clinicNb.length === 0 || animalNb.length === 0) throw new Error("Invalid animal delete query");
+      const client = await this.pool.connect();
+  
+      const query = `DELETE FROM TP3.Animal WHERE NoClinique = '${clinicNb}' AND NoAnimal = '${animalNb}';`;
+      const res = await client.query(query);
+      console.log(res);
+      client.release()
+      return res;
+    } catch(e) {
+      console.error(e);
+    }
+    return undefined;
+    
+  }
+
+  public async updateAnimal(animal: Animal): Promise<pg.QueryResult> {
+    const client = await this.pool.connect();
+
+    let toUpdateValues = [];
+  
+    if (animal.name.length > 0) toUpdateValues.push(`nom = '${animal.name}'`);
+    if (animal.type.length > 0) toUpdateValues.push(`type = '${animal.type}'`);
+    if (animal.species.length > 0) toUpdateValues.push(`espece = '${animal.species}'`);
+    if (animal.size.length > 0) toUpdateValues.push(`taille = ${animal.size}`);
+    if (animal.weight.length > 0) toUpdateValues.push(`poids = ${animal.weight}`);
+    if (animal.description.length > 0) toUpdateValues.push(`descriptionanimal = '${animal.description}'`);
+    if (animal.dateofbirth.length > 0) toUpdateValues.push(`datenaissance = '${animal.dateofbirth}'`);
+    if (animal.dateinscription.length > 0) toUpdateValues.push(`dateinscription = '${animal.dateinscription}'`);
+    if (animal.state.length > 0) toUpdateValues.push(`etat = '${animal.state}'`);
+    
+    if (!animal.animalnb || !animal.clinicnb || !animal.ownernb || toUpdateValues.length === 0) {
+      throw new Error("Invalid animal update query");
+    }
+     
+    const query = `UPDATE TP3.Animal SET ${toUpdateValues.join(", ")} WHERE NoClinique = '${animal.clinicnb}' AND NoAnimal = '${animal.animalnb}';`;
+    const res = await client.query(query);
     client.release();
     return res;
   }
@@ -163,23 +263,8 @@ export class DatabaseService {
   // }
 
 
-  // // modify name or city of a hotel
-  // public async updateHotel(hotel: Hotel): Promise<pg.QueryResult> {
-  //   const client = await this.pool.connect();
-
-  //   let toUpdateValues = [];
+  // modify name or city of a hotel
   
-  //   if (hotel.name.length > 0) toUpdateValues.push(`name = '${hotel.name}'`);
-  //   if (hotel.city.length > 0) toUpdateValues.push(`city = '${hotel.city}'`);
-
-  //   if (!hotel.hotelnb || hotel.hotelnb.length === 0 || toUpdateValues.length === 0)
-  //     throw new Error("Invalid hotel update query");
-
-  //   const query = `UPDATE HOTELDB.Hotel SET ${toUpdateValues.join(", ")} WHERE hotelNb = '${hotel.hotelnb}';`;
-  //   const res = await client.query(query);
-  //   client.release()
-  //   return res;
-  // }
 
 
   // public async deleteHotel(clinicNb: string, animalNb: string): Promise<void>/*Promise<pg.QueryResult>*/ {
@@ -233,15 +318,7 @@ export class DatabaseService {
   // }
 
 
-  // public async deleteRoom(hotelNb: string, roomNb: string): Promise<pg.QueryResult> {
-  //   if (hotelNb.length === 0) throw new Error("Invalid room delete query");
-  //   const client = await this.pool.connect();
-
-  //   const query = `DELETE FROM HOTELDB.Room WHERE hotelNb = '${hotelNb}' AND roomNb = '${roomNb}';`;
-  //   const res = await client.query(query);
-  //   client.release()
-  //   return res;
-  // }
+ 
 
 
   // // ======= GUEST =======

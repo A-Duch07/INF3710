@@ -12,10 +12,13 @@ import { CommunicationService } from "../communication.service";
 export class TreatmentComponent implements OnInit {
   public clinicPKs: string[] = [];
   public animals: Animal[] = [];
-  public treatments: Treatment[] = [];
-  // public duplicateError: boolean = false;
-  // public invalidHotelPK: boolean = false;
+  public treatments: Treatment[] = [{
+    treatmentnb: '12',
+    description: 'string',
+    price: '12',
+  }];
   
+
   public selectedClinic: string = "-1";
   public selectedAnimal: string = "-1";
 
@@ -31,8 +34,7 @@ export class TreatmentComponent implements OnInit {
 
   public updateSelectedClinic(clinicID: any): void {
     this.selectedClinic = this.clinicPKs[clinicID];
-    this.getAnimals();
-    this.refresh();
+    this.getAnimals(); 
   }
 
   public updateSelectedAnimal(animalID: any): void {
@@ -46,6 +48,7 @@ export class TreatmentComponent implements OnInit {
       .subscribe((animals: Animal[]) => {
         this.animals = animals;
         this.selectedAnimal = animals[0].animalnb;
+        this.refresh();
       });
   }
 

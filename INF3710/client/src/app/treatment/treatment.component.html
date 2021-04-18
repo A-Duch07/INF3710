@@ -42,11 +42,10 @@
       <th class="contentCell">COÛT</th>
     </thead>
     <tbody>
-      <tr *ngFor="let room of rooms; let i = index">
-        <td class="contentCell">{{ room.hotelnb }}</td>
-        <td class="contentCell">{{ room.roomnb }}</td>
-        <td class="contentCell">{{ room.type }}</td>
-        <td class="contentCell">{{ room.price }}</td>
+      <tr *ngFor="let traitement of treatments; let i = index">
+        <td class="contentCell">{{ traitement.treatmentnb }}</td>
+        <td class="contentCell">{{ traitement.description }}</td>
+        <td class="contentCell">{{ traitement.price }}</td>
       </tr>
     </tbody>
   </table>

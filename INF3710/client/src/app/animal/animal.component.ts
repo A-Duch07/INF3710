@@ -12,10 +12,11 @@ export class AnimalComponent implements OnInit {
   public ownerNBs: string[] = [];
   public animals: Animal[] = [];
 
+  @ViewChild("newAnimalNumber") public newAnimalNumber: ElementRef;
   @ViewChild("newAnimalName") public newAnimalName: ElementRef;
   @ViewChild("newAnimalType") public newAnimalType: ElementRef;
   @ViewChild("newAnimalSpecies") public newAnimalSpecies: ElementRef;
-  @ViewChild("newAnimalHeight") public newAnimalSize: ElementRef;
+  @ViewChild("newAnimalSize") public newAnimalSize: ElementRef;
   @ViewChild("newAnimalWeight") public newAnimalWeight: ElementRef;
   @ViewChild("newAnimalDescription") public newAnimalDescription: ElementRef;
   @ViewChild("newAnimalDateOfBirth") public newAnimalDateOfBirth: ElementRef;
@@ -57,6 +58,7 @@ export class AnimalComponent implements OnInit {
 
   private refresh(): void {
     this.getAnimals();
+    this.newAnimalNumber.nativeElement.innerText = "";
     this.newAnimalName.nativeElement.innerText = "";
     this.newAnimalType.nativeElement.innerText = "";
     this.newAnimalSpecies.nativeElement.innerText = "";
@@ -85,11 +87,11 @@ export class AnimalComponent implements OnInit {
   }
 
   public updateAnimal(i: number): void {
-    // this.communicationService
-    //   .updateRoom(this.rooms[i])
-    //   .subscribe((res: any) => {
-    //     this.refresh();
-    //   });
+    this.communicationService
+      .updateAnimal(this.animals[i])
+      .subscribe((res: any) => {
+        this.refresh();
+      });
   }
 
   public changeAnimalName(event: any, i: number): void {
@@ -137,17 +139,17 @@ export class AnimalComponent implements OnInit {
     this.animals[i].state = editField;
   }
 
-  public deleteAnimal(hotelNb: string, roomNb: string): void {
-    // this.communicationService
-    //   .deleteRoom(hotelNb, roomNb)
-    //   .subscribe((res: any) => {
-    //     this.refresh();
-    //   });
+  public deleteAnimal(clinicNb: string, animalNb: string): void {
+    this.communicationService
+      .deleteAnimal(clinicNb, animalNb)
+      .subscribe((res: any) => {
+        this.refresh();
+      });
   }
 
   public insertAnimal(): void {
    const animal: Animal = {
-      animalnb: "8",
+      animalnb: this.newAnimalNumber.nativeElement.innerText,
       clinicnb: this.selectedClinic,
       ownernb: this.selectedOwner,
       name: this.newAnimalName.nativeElement.innerText,
@@ -165,10 +167,11 @@ export class AnimalComponent implements OnInit {
       .insertAnimal(animal)
       .subscribe((res: number) => {
         if (res > 0) {
-          alert("Insertion échoué!");
-        } else {
           alert("Insertion réussi!");
+        } else {
+          alert("Insertion échoué!");
         }
+        this.refresh();
       });
   }
 }
