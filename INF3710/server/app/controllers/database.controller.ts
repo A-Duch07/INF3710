@@ -17,18 +17,6 @@ export class DatabaseController {
   public get router(): Router {
     const router: Router = Router();
 
-    router.get(
-      "/",
-      (req: Request, res: Response, _: NextFunction) => {
-        this.databaseService.getAllFromTable('Traitement').then((item) => {
-          res.json(item!.rows)
-        })
-          .catch((e: Error) => {
-            console.error(e.stack);
-          });
-      }
-    );
-
     // ======= ClINIC ROUTES =======
     router.get(
       "/clinics/clinicNb",
@@ -36,7 +24,7 @@ export class DatabaseController {
         this.databaseService
           .getClinicPKs()
           .then((result: pg.QueryResult) => {
-            const clinicNb: string[] = result.rows.map((row)=>{return row.noclinique});
+            const clinicNb: string[] = result.rows.map((row: any) => row.noclinique);
             res.json(clinicNb);
           })
 
@@ -46,13 +34,12 @@ export class DatabaseController {
       }
     );
 
-       // ======= ANIMALS ROUTES =======
-      router.get(
+    // ======= ANIMALS ROUTES =======
+    router.get(
         "/animals/:clinicNb/",
         (req: Request, res: Response, _: NextFunction) => {
-          const clinicNb = req.params.clinicNb;
-          this.databaseService
-            .getAnimalsByClinic(clinicNb)
+          const clinicNb: string = req.params.clinicNb;
+          this.databaseService.getAnimalsByClinic(clinicNb)
             .then((result: pg.QueryResult) => {
               const animals: Animal[] = result.rows.map((animal: any) => ({
                 animalnb : animal.noanimal,
@@ -70,13 +57,17 @@ export class DatabaseController {
               }));
               res.json(animals);
             })
-        }
-      )
 
-      router.get(
+            .catch((e: Error) => {
+              console.error(e.stack);
+            });
+        }
+      );
+
+    router.get(
         "/animals/namesearch/:text",
         (req: Request, res: Response, _: NextFunction) => {
-          const text = req.params.text;
+          const text: string = req.params.text;
           this.databaseService
             .getAnimalsByText(text)
             .then((result: pg.QueryResult) => {
@@ -96,15 +87,19 @@ export class DatabaseController {
               }));
               res.json(animals);
             })
+
+            .catch((e: Error) => {
+              console.error(e.stack);
+            });
         }
-      )
+      );
 
-
-      router.get(
+    router.get(
         "/animals/:clinicNb/:ownerNb",
         (req: Request, res: Response, _: NextFunction) => {
-          const clinicNb = req.params.clinicNb;
-          const ownerNb = req.params.ownerNb;
+          const clinicNb: string = req.params.clinicNb;
+          const ownerNb: string = req.params.ownerNb;
+          // tslint:disable-next-line: no-floating-promises
           this.databaseService
             .getAnimalsByOwnerAndClinic(clinicNb, ownerNb)
             .then((result: pg.QueryResult) => {
@@ -124,30 +119,42 @@ export class DatabaseController {
               }));
               res.json(animals);
             })
+
+            .catch((e: Error) => {
+              console.error(e.stack);
+            });
         }
-      )
+      );
 
+    router.post(
+        "/animals/insert",
+        (req: Request, res: Response, _: NextFunction) => {
+          const animal: Animal = {
+            animalnb: req.body.animalnb,
+            clinicnb: req.body.clinicnb,
+            ownernb: req.body.ownernb,
+            name: req.body.name,
+            type: req.body.type,
+            species: req.body.species,
+            size: req.body.size,
+            weight: req.body.weight,
+            description: req.body.description,
+            dateofbirth: req.body.dateofbirth,
+            dateinscription: req.body.dateinscription,
+            state: req.body.state,
+          };
 
-      // router.post(
-      //   "/animals/insert",
-      //   (req: Request, res: Response, _: NextFunction) => {
-      //     const hotel: Hotel = {
-      //       hotelnb: req.body.hotelnb,
-      //       name: req.body.name,
-      //       city: req.body.city,
-      //     };
-
-      //     this.databaseService
-      //       .insertAnimal(hotel)
-      //       .then((result: pg.QueryResult) => {
-      //         res.json(result.rowCount);
-      //       })
-      //       .catch((e: Error) => {
-      //         console.error(e.stack);
-      //         res.json(-1);
-      //       });
-      //   }
-      // );
+          this.databaseService
+            .insertAnimal(animal)
+            .then((result: pg.QueryResult) => {
+              res.json(result.rowCount);
+            })
+            .catch((e: Error) => {
+              console.error(e.stack);
+              res.json(-1);
+            });
+        }
+      );
 
 
     //   router.post(
@@ -189,14 +196,14 @@ export class DatabaseController {
 
 
       // ======= OWNERS ROUTES =======
-      router.get(
+    router.get(
         "/owners/ownerNb/:clinicNb",
         (req: Request, res: Response, _: NextFunction) => {
           const clinicNb = req.params.clinicNb;
           this.databaseService
             .getOwnerPKsFromClinic(clinicNb)
             .then((result: pg.QueryResult) => {
-              const ownerNb: string[] = result.rows.map((row)=>{return row.noproprietaire});
+              const ownerNb: string[] = result.rows.map((row) =>row.noproprietaire);
               res.json(ownerNb);
             })
 

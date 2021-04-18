@@ -60,7 +60,7 @@ export class AnimalComponent implements OnInit {
     this.newAnimalName.nativeElement.innerText = "";
     this.newAnimalType.nativeElement.innerText = "";
     this.newAnimalSpecies.nativeElement.innerText = "";
-    this.newAnimalHeight.nativeElement.innerText = "";
+    this.newAnimalSize.nativeElement.innerText = "";
     this.newAnimalWeight.nativeElement.innerText = "";
     this.newAnimalDescription.nativeElement.innerText = "";
     this.newAnimalDateOfBirth.nativeElement.innerText = "";
@@ -146,30 +146,29 @@ export class AnimalComponent implements OnInit {
   }
 
   public insertAnimal(): void {
-    // const room: Room = {
-    //   hotelnb: this.selectedHotel,
-    //   roomnb: this.newRoomNb.nativeElement.innerText,
-    //   type: this.newRoomType.nativeElement.innerText,
-    //   price: this.newRoomPrice.nativeElement.innerText,
-    // };
-   
-    const animal: Animal = {
-      animalnb: "test",
+   const animal: Animal = {
+      animalnb: "8",
       clinicnb: this.selectedClinic,
       ownernb: this.selectedOwner,
       name: this.newAnimalName.nativeElement.innerText,
       type: this.newAnimalType.nativeElement.innerText,
       species: this.newAnimalSpecies.nativeElement.innerText,
-      size: this.newAnimalS.nativeElement.innerText,
+      size: this.newAnimalSize.nativeElement.innerText,
       weight: this.newAnimalWeight.nativeElement.innerText,
       description: this.newAnimalDescription.nativeElement.innerText,
       dateofbirth: this.newAnimalDateOfBirth.nativeElement.innerText,
       dateinscription: this.newAnimalDateInscription.nativeElement.innerText,
       state: this.newAnimalState.nativeElement.innerText,
-    }
+    };
 
-    // this.communicationService.insertRoom(room).subscribe((res: number) => {
-    //   this.refresh();
-    // });
+   this.communicationService
+      .insertAnimal(animal)
+      .subscribe((res: number) => {
+        if (res > 0) {
+          alert("Insertion échoué!");
+        } else {
+          alert("Insertion réussi!");
+        }
+      });
   }
 }

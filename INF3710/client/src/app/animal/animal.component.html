@@ -77,7 +77,7 @@
         <td class="contentCell" contenteditable="true" (blur)="changeAnimalSize($event, i)">{{ animal.size }}</td>
         <td class="contentCell" contenteditable="true" (blur)="changeAnimalWeight($event, i)">{{ animal.weight }}</td>
         <td class="contentCell" contenteditable="true" (blur)="changeAnimalDescription($event, i)">{{ animal.description }}</td>
-        <td class="contentCell" contenteditable="true" (blur)="changeAnimalDateOfBirth($event, i)">{{ animal.dateofbirth }}</td>
+        <td class="contentCell" contenteditable="true" type="date" (blur)="changeAnimalDateOfBirth($event, i)">{{ animal.dateofbirth }}</td>
         <td class="contentCell" contenteditable="true" (blur)="changeAnimalDateInscription($event, i)">{{ animal.dateinscription }}</td>
         <td class="contentCell" contenteditable="true" (blur)="changeAnimalState($event, i)">{{ animal.state }}</td>
         <td class="actionCell">

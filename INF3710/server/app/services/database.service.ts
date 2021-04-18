@@ -1,32 +1,29 @@
 import { injectable } from "inversify";
 import * as pg from "pg";
 import "reflect-metadata";
+import { Animal } from "../../../common/tables/animal";
 
 @injectable()
 export class DatabaseService {
-  
-
 
   public connectionConfig: pg.ConnectionConfig = {
-    connectionString: 'postgresql://postgres:changeme@127.0.0.1:5432/TP3',
+    connectionString: 'postgresql://postgres:admin@127.0.0.1:5432/TP3',
     keepAlive: true,
-    connectionTimeoutMillis: 1000,
-    query_timeout: 1000,
     statement_timeout: 1000,
   };
 
   public pool: pg.Pool;
 
-  constructor(){
+  public constructor () {
     this.pool = new pg.Pool(this.connectionConfig);
   }
 
   // ======= DEBUG =======
   public async getAllFromTable(tableName: string): Promise<pg.QueryResult|undefined> {
     try {
-      const client = await this.pool.connect();
-      const res = client.query(`SELECT * FROM TP3.${tableName};`);
-      client.release()
+      const client: pg.PoolClient = await this.pool.connect();
+      const res: any = client.query(`SELECT * FROM TP3.${tableName};`);
+      client.release();
       return res;
     } catch(e) {
       console.error(e);
@@ -34,11 +31,10 @@ export class DatabaseService {
     return undefined;
   }
 
-
   public async getAnimalsByClinic(clinicNb: string):Promise<pg.QueryResult|undefined> {
     try {
-      const client = await this.pool.connect();
-      const res = client.query(`SELECT * FROM TP3.Animal WHERE NoClinique='${clinicNb}';`);
+      const client: pg.PoolClient = await this.pool.connect();
+      const res: any = client.query(`SELECT * FROM TP3.Animal WHERE NoClinique='${clinicNb}';`);
       client.release();
       return res;
     } catch(e) {
@@ -49,9 +45,8 @@ export class DatabaseService {
 
   public async getAnimalsByOwnerAndClinic(clinicNb: string, ownerNb: string):Promise<pg.QueryResult|undefined> {
     try {
-      // http://localhost:3000/database/animals/C01/33
-      const client = await this.pool.connect();
-      const res = client.query(`SELECT * FROM TP3.Animal WHERE NoClinique='${clinicNb}' AND NoProprietaire=${ownerNb};`);
+      const client: pg.PoolClient = await this.pool.connect();
+      const res: any = client.query(`SELECT * FROM TP3.Animal WHERE NoClinique='${clinicNb}' AND NoProprietaire=${ownerNb};`);
       client.release();
       return res;
     } catch(e) {
@@ -62,9 +57,8 @@ export class DatabaseService {
 
   public async getAnimalsByText(text: string):Promise<pg.QueryResult|undefined> {
     try {
-      // http://localhost:3000/database/animals/C01/33
-      const client = await this.pool.connect();
-      const res = client.query(`SELECT * FROM TP3.Animal WHERE Nom LIKE '%${text}%'`);
+      const client: pg.PoolClient = await this.pool.connect();
+      const res: any = client.query(`SELECT * FROM TP3.Animal WHERE Nom LIKE '%${text}%'`);
       client.release();
       return res;
     } catch(e) {
@@ -75,8 +69,8 @@ export class DatabaseService {
 
   public async getClinicPKs():Promise<pg.QueryResult|undefined> {
     try {
-      const client = await this.pool.connect();
-      const res = client.query('SELECT NoClinique FROM TP3.Clinique;');
+      const client: pg.PoolClient = await this.pool.connect();
+      const res: any = client.query('SELECT NoClinique FROM TP3.Clinique;');
       client.release();
       return res;
     } catch(e) {
@@ -86,8 +80,8 @@ export class DatabaseService {
   }
   public async getOwnerPKsFromClinic( clinicID:string):Promise<pg.QueryResult|undefined> {
     try {
-      const client = await this.pool.connect();
-      const res = client.query(`SELECT NoProprietaire FROM TP3.ProprietaireAnimal WHERE NoClinique='${clinicID}';`);
+      const client: pg.PoolClient = await this.pool.connect();
+      const res: any = client.query(`SELECT NoProprietaire FROM TP3.ProprietaireAnimal WHERE NoClinique='${clinicID}';`);
       client.release();
       return res;
     } catch(e) {
@@ -95,6 +89,34 @@ export class DatabaseService {
     }
     return undefined;
 
+  }
+
+  public async insertAnimal(animal: Animal): Promise<pg.QueryResult> {
+    const client: pg.PoolClient = await this.pool.connect();
+
+    if (!animal.animalnb || !animal.clinicnb || !animal.ownernb ) {
+      throw new Error("Invalid insert animal values");
+    }
+
+    const values: string[] = [
+      animal.animalnb,
+      animal.clinicnb,
+      animal.name,
+      animal.type,
+      animal.species,
+      animal.size,
+      animal.weight,
+      animal.description,
+      animal.dateofbirth,
+      animal.dateinscription,
+      animal.state,
+      animal.ownernb,
+    ];
+    const queryText: string = `INSERT INTO TP3.Animal VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12);`;
+
+    const res: any = await client.query(queryText, values);
+    client.release();
+    return res;
   }
 
   // // ======= HOTEL =======
@@ -163,30 +185,6 @@ export class DatabaseService {
   // public async deleteHotel(clinicNb: string, animalNb: string): Promise<void>/*Promise<pg.QueryResult>*/ {
   //   // TO-DO
     
-  // }
-
-
-  // // ======= ROOMS =======
-  // public async createRoom(room: Room): Promise<pg.QueryResult> {
-  //   const client = await this.pool.connect();
-
-  //   if (!room.roomnb || !room.hotelnb || !room.type || !room.price)
-  //     throw new Error("Invalid create room values");
-
-  //   const values: string[] = [
-  //     room.roomnb,
-  //     room.hotelnb,
-  //     room.type,
-  //     room.price.toString(),
-  //   ];
-  //   const queryText: string = `INSERT INTO HOTELDB.ROOM VALUES($1, $2, $3, $4);`;
-
-  //   const res = await client.query(queryText, values);
-  //   client.release()
-  //   return res;
-  // }
-
-
   // public async filterRooms(
   //   hotelNb: string,
   //   roomNb: string = "",
